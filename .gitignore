@@ -1,0 +1,20 @@
+#OpenFOAM time directories
+[0-9]*/
+!0/
+!0.orig/
+
+#mesh
+constant/polyMesh/
+constant/*/polyMesh/
+
+#parallel decomposition
+processor*/
+
+#logs and post-processing output
+log.*
+postProcessing/
+*.foam
+*.vtk
+
+# macOS
+.DS_Store
