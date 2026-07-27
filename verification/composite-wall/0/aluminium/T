@@ -1,0 +1,35 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0/aluminium";
+    object      T;
+}
+
+dimensions      [0 0 0 1 0 0 0];
+
+internalField   uniform 325;
+
+boundaryField
+{
+    hot
+    {
+        type            fixedValue;
+        value           uniform 350;
+    }
+
+    adiabatic
+    {
+        type            zeroGradient;
+    }
+
+    aluminium_to_TIM
+    {
+        type            compressible::turbulentTemperatureCoupledBaffleMixed;
+        Tnbr            T;
+        kappaMethod     solidThermo;
+        value           uniform 325;
+    }
+}
+
