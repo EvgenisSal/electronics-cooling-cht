@@ -30,3 +30,23 @@ timePrecision	6;
 runTimeModifiable true;
 
 
+functions
+{
+    wallHeatFlux_aluminium
+    {
+        type            wallHeatFlux;
+        libs            ("libfieldFunctionObjects.so");
+        region          aluminium;
+        patches         (aluminium_to_TIM hot);
+        writeControl    writeTime;
+    }
+
+    wallHeatFlux_TIM
+    {
+        type            wallHeatFlux;
+        libs            ("libfieldFunctionObjects.so");
+        region          TIM;
+        patches         (TIM_to_aluminium cold);
+        writeControl    writeTime;
+    }
+}
