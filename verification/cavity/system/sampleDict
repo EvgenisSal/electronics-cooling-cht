@@ -1,0 +1,26 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      sampleDict;
+}
+
+type surfaces;
+libs ("libsampling.so");
+
+interpolationScheme cell;
+
+surfaceFormat raw;
+
+surfaces
+(
+    hotWall
+    {
+        type        patch;
+        patches     ( hot );
+        interpolate false;
+    }
+);
+
+fields ( grad(T) );
