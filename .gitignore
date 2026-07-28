@@ -4,8 +4,8 @@
 !0.orig/
 
 #mesh
-constant/polyMesh/
-constant/*/polyMesh/
+polyMesh/
+cellToRegion
 
 #parallel decomposition
 processor*/
