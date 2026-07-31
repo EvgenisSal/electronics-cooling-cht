@@ -12,3 +12,9 @@ de Vahl Davis natural convection, Ra=1e5. buoyantBoussinesqSimpleFoam Boussinesq
 Nu_avg 4.69 vs 4.519 benchmark (3.8%). Fought 25-59% error: was NON-CONVERGENCE,
 not mesh. Added residualControl 1e-5, converged 9151 iter. Python was reading old
 timestep 2000 not 9151 - fixed to auto-find latest. Phase 1 verification DONE.
+
+## 2026-07-31 — Phase 2: unit cell mesh
+- genBlockMesh.py: Python -> blockMeshDict, parametric, 4 cellZones (air/chip/TIM/heatsink).
+- 18 blocks, tensor-product vertex grid, patches inlet/outlet/symLeft/symRight + defaultPatch walls.
+- blockMesh + checkMesh OK: non-ortho 0, skew ~0, max aspect 12. Trimmed 168k -> ~49k baseline.
+- Next: splitMeshRegions -cellZones, then per-region 0/ BCs + constant/ properties.
