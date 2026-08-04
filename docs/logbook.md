@@ -18,3 +18,10 @@ timestep 2000 not 9151 - fixed to auto-find latest. Phase 1 verification DONE.
 - 18 blocks, tensor-product vertex grid, patches inlet/outlet/symLeft/symRight + defaultPatch walls.
 - blockMesh + checkMesh OK: non-ortho 0, skew ~0, max aspect 12. Trimmed 168k -> ~49k baseline.
 - Next: splitMeshRegions -cellZones, then per-region 0/ BCs + constant/ properties.
+
+## 2026-08-04 — Phase 2 complete
+- splitMeshRegions -cellZones: 4 regions (air / chip / TIM / heatsink)
+- Conformal interfaces, CHT path: chip -> TIM -> heatsink -> air
+- air_to_heatsink = single fluid-solid coupled patch
+- regionProperties: fluid (air), solid (chip TIM heatsink)
+- Mesh OK (non-ortho 0, skewness ~0)
