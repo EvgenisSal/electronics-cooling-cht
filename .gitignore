@@ -18,3 +18,10 @@ postProcessing/
 
 # macOS
 .DS_Store
+
+# OpenFOAM run outputs
+[1-9]*/
+processor*/
+postProcessing/
+log.*
+*.log

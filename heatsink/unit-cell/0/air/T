@@ -1,0 +1,45 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0/air";
+    object      T;
+}
+
+dimensions      [0 0 0 1 0 0 0];
+internalField   uniform 300;
+
+boundaryField
+{
+    inlet
+    {
+        type            fixedValue;
+        value           uniform 300;
+    }
+    outlet
+    {
+        type            inletOutlet;
+        inletValue      uniform 300;
+        value           uniform 300;
+    }
+    walls
+    {
+        type            zeroGradient;
+    }
+    symLeft
+    {
+        type            symmetryPlane;
+    }
+    symRight
+    {
+        type            symmetryPlane;
+    }
+    air_to_heatsink
+    {
+        type            compressible::turbulentTemperatureCoupledBaffleMixed;
+        Tnbr            T;
+        kappaMethod     fluidThermo;
+        value           uniform 300;
+    }
+}

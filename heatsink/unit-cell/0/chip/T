@@ -1,0 +1,34 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0/chip";
+    object      T;
+}
+
+dimensions      [0 0 0 1 0 0 0];
+internalField   uniform 300;
+
+boundaryField
+{
+    symLeft
+    {
+        type            symmetryPlane;
+    }
+    symRight
+    {
+        type            symmetryPlane;
+    }
+    walls
+    {
+        type            zeroGradient;
+    }
+    chip_to_TIM
+    {
+        type            compressible::turbulentTemperatureCoupledBaffleMixed;
+        Tnbr            T;
+        kappaMethod     solidThermo;
+        value           uniform 300;
+    }
+}
