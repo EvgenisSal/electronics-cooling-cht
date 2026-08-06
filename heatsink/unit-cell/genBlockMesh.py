@@ -7,10 +7,16 @@ x = [0.0, 20.0, 60.0, 100.0]      # inlet | heatsink | outlet
 y = [0.0, 0.5, 5.0, 5.5]          # half-fin | channel | half-fin
 z = [0.0, 1.0, 1.2, 4.2, 24.2]    # chip | TIM | base | fins+channel
 
-# --- Cells per interval ---
-nx = [15, 40, 20]      # inlet, heatsink, outlet
-ny = [3, 16, 3]        # finL, channel, finR
-nz = [3, 2, 6, 24]     # chip, TIM, base, fins
+# --- Cells per interval (scaled by refinement factor) ---
+import sys
+REFINE = float(sys.argv[1]) if len(sys.argv) > 1 else 1.0
+
+def scale(lst):
+    return [max(1, round(v * REFINE)) for v in lst]
+
+nx = scale([15, 40, 20])   # inlet, heatsink, outlet
+ny = scale([3, 16, 3])     # finL, channel, finR
+nz = scale([3, 2, 6, 24])  # chip, TIM, base, fins
 
 # --- Build vertex grid ---
 nX, nY, nZ = len(x), len(y), len(z)
