@@ -35,3 +35,12 @@ timestep 2000 not 9151 - fixed to auto-find latest. Phase 1 verification DONE.
 - Baseline: T_max chip = 384.43 K -> R_th = (384.43-300)/5 = 16.9 K/W
 - Next: substep 5 mesh independence + GCI
 
+## 2026-08-06 — Phase 3 substep 5 (mesh independence + GCI) — COMPLETE
+- Parametrized genBlockMesh.py with refinement factor (argv)
+- runLevel.sh: automated mesh -> split -> solve -> extract pipeline
+- 3 meshes: coarse 49k, medium 111k, fine 238k (r ~1.3)
+- T_max: 384.44 / 385.93 / 387.17 K (monotonic)
+- GCI (Roache): p=0.49, asymptotic ratio 1.003 (valid)
+- Fine-mesh uncertainty: 3.0% on T_max, 13.5% on R_th
+- R_th fine = 17.4 K/W, Richardson extrapolation = 19.3 K/W
+- Phase 3 COMPLETE
