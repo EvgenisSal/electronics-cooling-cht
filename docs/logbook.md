@@ -25,3 +25,13 @@ timestep 2000 not 9151 - fixed to auto-find latest. Phase 1 verification DONE.
 - air_to_heatsink = single fluid-solid coupled patch
 - regionProperties: fluid (air), solid (chip TIM heatsink)
 - Mesh OK (non-ortho 0, skewness ~0)
+
+## 2026-08-06 — Phase 3 substeps 3-4 (baseline)
+- chtMultiRegionSimpleFoam case complete: materials, 0/ fields, fvOptions (5W chip), numerics
+- Fluid air: rhoConst, laminar, U_in=2 m/s, T_in=300K
+- Solid regions need dummy p field (thermo API requirement)
+- Slow solid convergence fixed by relaxation boost: U 0.3->0.5, h 0.3->0.7
+- Converged (residuals <1e-4) on coarse mesh ~49k cells
+- Baseline: T_max chip = 384.43 K -> R_th = (384.43-300)/5 = 16.9 K/W
+- Next: substep 5 mesh independence + GCI
+
