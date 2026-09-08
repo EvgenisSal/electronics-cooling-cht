@@ -60,3 +60,23 @@ timestep 2000 not 9151 - fixed to auto-find latest. Phase 1 verification DONE.
   Negligible change to final engineering conclusion.
 - Old (k=4) results kept as heatsink/unit-cell/mesh-independence-k4-WRONG.dat
   for transparency.
+
+## 2026-09-08 — Phase 4.4: full-sink laminar baseline
+- Full-sink case setup complete: 4 regions, real 20x20mm chip footprint
+  centered in 40x44mm base, 8 full fins + side walls (not symmetry).
+- 0/ BCs, materials, fvOptions (75W chip, real total load) ported from
+  unit-cell and adapted (dropped symLeft/symRight, real walls patch).
+- Added wallHeatFlux functionObject on heatsink region for energy balance check.
+- Laminar run, 102915 cells, converged 10000 iterations, 694s compute time.
+- Energy balance verified: heatsink_to_TIM = +75.00 W in, heatsink_to_air
+  = -75.00 W out (matches applied 75W chip load almost exactly).
+- T_max chip = 486.55 K, R_th = (486.55-300)/75 = 2.49 K/W.
+- R_th much lower than unit-cell's 17.4 K/W (expected -- 8 fins operate in
+  parallel on the real geometry, vs unit-cell's single-fin idealization).
+  Naive parallel estimate: 17.4/8 = 2.18 K/W. Real R_th (2.49) is ~13%
+  higher than this naive estimate, attributed to spreading resistance
+  (heat must spread laterally from the small chip footprint into the full
+  40x44mm base) and edge effects (outer fins see different local flow
+  than the interior fins) -- exactly the effects the unit-cell/symmetry
+  simplification could not capture.
+- Next: Phase 4.5, same mesh with k-omega SST turbulence model.

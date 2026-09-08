@@ -1,0 +1,19 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant/chip";
+    object      fvOptions;
+}
+
+heatSource
+{
+    type            scalarSemiImplicitSource;
+    selectionMode   all;
+    volumeMode      absolute;
+    injectionRateSuSp
+    {
+        h           (75 0);
+    }
+}

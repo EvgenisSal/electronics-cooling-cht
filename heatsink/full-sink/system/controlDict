@@ -19,3 +19,16 @@ writeFormat     ascii;
 writePrecision  7;
 timeFormat      general;
 runTimeModifiable true;
+
+
+functions
+{
+    wallHeatFlux_heatsink
+    {
+        type            wallHeatFlux;
+        libs            ("libfieldFunctionObjects.so");
+        region          heatsink;
+        patches         (heatsink_to_air heatsink_to_TIM);
+        writeControl    writeTime;
+    }
+}
