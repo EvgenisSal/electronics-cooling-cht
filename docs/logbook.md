@@ -44,3 +44,19 @@ timestep 2000 not 9151 - fixed to auto-find latest. Phase 1 verification DONE.
 - Fine-mesh uncertainty: 3.0% on T_max, 13.5% on R_th
 - R_th fine = 17.4 K/W, Richardson extrapolation = 19.3 K/W
 - Phase 3 COMPLETE
+
+## 2026-09-08 — TIM material errata + GCI rerun
+- Found TIM/thermophysicalProperties had kappa=4, Cp=800 since first commit
+  (d6f1bbe, Aug 6) instead of the verified composite-wall values kappa=5, Cp=1000.
+- Root cause: typo/data-entry error when creating the file, never corrected.
+- Discovered while setting up Phase 4 full-sink (copied TIM properties, noticed
+  mismatch vs composite-wall verification case).
+- Corrected kappa 4->5, Cp 800->1000. Re-ran full GCI sweep (coarse/medium/fine).
+- Impact: T_max shifted ~0.2K lower across all 3 meshes (higher TIM k = less
+  thermal resistance = cooler chip), consistent direction and magnitude at
+  every refinement level. GCI methodology unaffected: p=0.485 (was 0.49),
+  asymptotic ratio 1.003 (unchanged), GCI fine T_max 3.04% (was ~3.0%).
+- R_th fine = 17.39 K/W (was 17.4), Richardson extrap = 19.27 K/W (was 19.3).
+  Negligible change to final engineering conclusion.
+- Old (k=4) results kept as heatsink/unit-cell/mesh-independence-k4-WRONG.dat
+  for transparency.
