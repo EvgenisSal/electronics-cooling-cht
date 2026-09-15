@@ -31,4 +31,31 @@ functions
         patches         (heatsink_to_air heatsink_to_TIM);
         writeControl    writeTime;
     }
+
+    inletPressure
+    {
+        type            surfaceFieldValue;
+        libs            ("libfieldFunctionObjects.so");
+        region          air;
+        regionType      patch;
+        name            inlet;
+        operation       average;
+        fields          (p_rgh);
+        writeControl    writeTime;
+        writeFields     false;
+    }
+
+    outletPressure
+    {
+        type            surfaceFieldValue;
+        libs            ("libfieldFunctionObjects.so");
+        region          air;
+        regionType      patch;
+        name            outlet;
+        operation       average;
+        fields          (p_rgh);
+        writeControl    writeTime;
+        writeFields     false;
+    }
 }
+

@@ -111,3 +111,48 @@ Comparison (same 102915-cell mesh, same 75W chip load):
   Phase 4.4 entry).
 - Next: Phase 5, parametric study (airflow, heat load, fin spacing) +
   Pareto R_th vs pumping power.
+
+## 2026-09-15 — Phase 5: parametric airflow sweep + Pareto analysis — COMPLETE
+- Design choice: swept inlet airflow rate only (no remeshing needed), not
+  fin geometry -- geometric sweep would require new mesh per point, too
+  costly given hardware/time constraints. Airflow sweep already produces
+  a valid Pareto trade-off.
+- Added surfaceFieldValue functionObjects (inletPressure, outletPressure,
+  regionType patch, operation average, field p_rgh) to controlDict for
+  pressure drop extraction. Note: the correct OpenFOAM v2606 function
+  object type is "surfaceFieldValue" with regionType patch -- "patchAverage"
+  is not a real function object type (it's a caseDicts template alias),
+  using it directly threw "Unknown function type patchAverage".
+- airflowSweep.sh: automated set-U -> run -> extract-T_max-and-pressure
+  pipeline, same pattern as Phase 3's runLevel.sh.
+- Swept U = 1.0, 1.5, 2.0, 3.0, 4.0 m/s, laminar (justified in Phase 4:
+  laminar vs SST difference was only ~1.6%), same 102915-cell full-sink
+  mesh, 75W chip load, all runs to full 10000 iterations.
+
+Results:
+| U (m/s) | Tmax (K) | Rth (K/W) | dP (Pa) | Ppump (mW) |
+|---------|----------|-----------|---------|------------|
+| 1.0     | 530.87   | 3.078     | 1.29    | 1.14       |
+| 1.5     | 502.48   | 2.700     | 2.20    | 2.90       |
+| 2.0     | 486.55   | 2.487     | 3.24    | 5.70       |
+| 3.0     | 468.75   | 2.250     | 5.62    | 14.84      |
+| 4.0     | 458.82   | 2.118     | 8.31    | 29.25      |
+
+- Pumping power = dP x Q, Q = U x A_inlet (A_inlet = 8.8e-4 m2).
+- Pareto front: all 5 points are non-dominated (no point improves both
+  Rth and Ppump simultaneously vs another). Clear "knee" between
+  U=2.0-3.0 m/s: below the knee, small pumping power increases buy large
+  Rth improvements (U=1->2: -0.59 K/W for +4.6mW); above the knee,
+  diminishing returns (U=3->4: only -0.13 K/W for +14.4mW, pumping power
+  roughly doubles for a fraction of the thermal gain).
+- Engineering conclusion: the Pareto front does not have a single
+  "optimal" point -- it defines the set of non-dominated design choices.
+  Without an external constraint (e.g. a maximum allowable chip junction
+  temperature, an available fan's pressure-flow curve, or a noise/power
+  budget), the knee (~U=2.0-2.5 m/s) is a reasonable default choice
+  balancing cooling and pumping cost. If a specific minimum cooling
+  requirement existed (e.g. Tmax below a datasheet limit), the correct
+  choice would instead be the lowest U on the front that satisfies it,
+  even if that falls past the knee.
+- PHASE 5 COMPLETE.
+- Next: Phase 6, documentation + ParaView screenshots.
