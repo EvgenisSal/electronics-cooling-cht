@@ -1,0 +1,36 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0/air";
+    object      k;
+}
+
+dimensions      [0 2 -2 0 0 0 0];
+internalField   uniform 0.015;
+
+boundaryField
+{
+    inlet
+    {
+        type            fixedValue;
+        value           uniform 0.015;
+    }
+    outlet
+    {
+        type            inletOutlet;
+        inletValue      uniform 0.015;
+        value           uniform 0.015;
+    }
+    walls
+    {
+        type            kqRWallFunction;
+        value           uniform 0.015;
+    }
+    air_to_heatsink
+    {
+        type            kqRWallFunction;
+        value           uniform 0.015;
+    }
+}

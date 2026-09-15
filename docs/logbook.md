@@ -80,3 +80,34 @@ timestep 2000 not 9151 - fixed to auto-find latest. Phase 1 verification DONE.
   than the interior fins) -- exactly the effects the unit-cell/symmetry
   simplification could not capture.
 - Next: Phase 4.5, same mesh with k-omega SST turbulence model.
+
+## 2026-09-08 — Phase 4.5-4.6: k-omega SST comparison + Phase 4 COMPLETE
+- Added RAS/kOmegaSST turbulence model to air region: turbulenceProperties,
+  0/air/{k,omega,nut,alphat} fields, fvSchemes divSchemes for k/omega,
+  fvSolution solver settings + residualControl + relaxation for k/omega.
+- Inlet turbulence quantities from standard formulas: I=5%, Dh=7.35mm,
+  L=0.07*Dh -> k=0.015 m2/s2, omega=434.6 1/s.
+- Fixed missing wallDist{method meshWave;} entry required by kOmegaSST
+  (FATAL ERROR on first run, resolved).
+- Ran full 10000 iterations (same as laminar, for fair comparison) --
+  residualControl technically satisfied per-field well before 10000 but
+  multi-region solver didn't trigger early stop; residuals were already
+  at 1e-7 to 1e-9 by iteration ~1600, so this is a non-issue.
+- Energy balance verified again: 74.9999/-74.9998 W (matches laminar).
+
+Comparison (same 102915-cell mesh, same 75W chip load):
+| Metric        | Laminar  | k-omega SST |
+|---------------|----------|-------------|
+| T_max chip    | 486.55 K | 483.63 K    |
+| R_th          | 2.49 K/W | 2.45 K/W    |
+
+- SST predicts ~1.6% lower R_th than laminar -- turbulence enhances heat
+  transfer slightly in this transitional Re range (850-1700), as expected.
+  Difference is small: laminar assumption was a reasonable engineering
+  simplification for this problem, though not perfectly accurate.
+- PHASE 4 COMPLETE. Full-sink baseline established, both turbulence
+  regimes characterized, real-geometry R_th vs unit-cell R_th relationship
+  explained (parallel fins + spreading resistance + edge effects, see
+  Phase 4.4 entry).
+- Next: Phase 5, parametric study (airflow, heat load, fin spacing) +
+  Pareto R_th vs pumping power.
