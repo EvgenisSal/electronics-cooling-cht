@@ -2,7 +2,7 @@
 
 ![Airflow streamlines](heatsink/full-sink/paraview/airflow_streamlines_opacity45.png)
 
-**75 W chip load | 2.49 K/W baseline R_th (laminar) | 102,915 cells | 1–4 m/s airflow sweep, Pareto-optimised**
+**75 W chip load | 2.49 K/W baseline R_th (laminar) | 102,915 cells | 1–4 m/s airflow sweep, Pareto analysis**
 
 CHT simulation of an air-cooled plate-fin heat sink, built in OpenFOAM v2606.
 Run entirely on a MacBook Air M2, 8 GB RAM — no cluster, no GPU.
