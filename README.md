@@ -37,9 +37,8 @@ Air-cooled plate-fin heat sink, envelope 100×44×24.2 mm.
 
 Air properties assumed constant: rho = 1.1, mu = 1.9e-5, cp = 1005,
 Pr = 0.71, k = 0.0269 (SI units). Channel Reynolds number is roughly
-850–1700 depending on inlet velocity — the laminar/turbulent transition
-range, which is why turbulence modelling gets checked explicitly rather
-than assumed away.
+850–1700 depending on inlet velocity, so both laminar and
+turbulence-modelled cases were compared.
 
 ## Phase 1 — Verification
 
@@ -56,9 +55,8 @@ sink: conduction, forced convection, natural convection.
 Details, meshes, and reproduction steps are in `verification/<case>/README.md`
 for each of the three.
 
-One lesson worth stating: the cavity case initially showed 25–59% error,
-and the cause was not the mesh or the Rayleigh number, it was
-non-convergence — residuals had plateaued at 1e-4 without a
+The cavity case initially showed 25–59% error because the solution had
+not fully converged. Residuals had plateaued at 1e-4 without a
 `residualControl` block. Every case in this repo since then uses explicit
 residual control, and post-processing scripts auto-detect the latest
 converged timestep instead of reading a hardcoded one.
@@ -70,7 +68,7 @@ writes `blockMeshDict` directly, rather than through CAD or snappyHexMesh.
 The script classifies every block into one of four cellZones (air, chip,
 TIM, heatsink) using a geometric rule — "is this block's (x,y) footprint
 inside the chip window and this z inside the chip layer" — rather than a
-hardcoded list of which block is which. That's what lets the same script
+hardcoded list of which block is which. This allows the same script to
 generate both the symmetric unit-cell mesh and the full 8-fin geometry
 without rewriting the block-assignment logic.
 
@@ -84,8 +82,7 @@ solves as a proper conjugate problem.
 Because a mesh study needs many runs at increasing resolution, this part
 uses a 1-pitch unit-cell slice (symmetry planes on both sides) rather
 than the full 8-fin geometry — one fin, one channel, uniform heating
-approximation. It is a proxy for convergence behaviour, not the final
-answer.
+approximation, used only for the mesh-convergence study.
 
 Three meshes (49k / 111k / 238k cells, refinement ratio ≈1.3) were run
 to steady state, and Roache's GCI method applied to the peak chip
@@ -96,28 +93,19 @@ temperature:
 - Fine-mesh uncertainty: 3.0% on T_max, 13.5% on R_th
 - R_th (fine mesh) = 17.39 K/W, Richardson-extrapolated R_th = 19.27 K/W
 
-**Errata, kept for transparency:** the TIM thermal conductivity in this
-case was originally entered as k = 4 W/mK instead of the verified value
-of k = 5 W/mK (a data-entry error from when the file was first created).
-I caught it while setting up the full-sink case in Phase 4 — I had
-already set the correct k = 5 W/mK there, then went back and cross-checked
-it against this unit-cell file and the composite-wall verification
-material, and found the mismatch. Went back and reran the full GCI sweep
-here with the corrected value; the old results are kept as
-`heatsink/unit-cell/mesh-independence-k4-WRONG.dat`. Effect on the
-numbers above: about 0.2 K lower T_max across all three meshes, GCI
-methodology and asymptotic ratio essentially unchanged (the error was
-systematic across all mesh levels, so it mostly cancels in the GCI ratio).
-Full writeup in `docs/logbook.md`.
-
+**Erratum:** the unit-cell model originally used TIM conductivity
+k = 4 W/mK instead of the verified value of 5 W/mK. The GCI sweep was
+rerun with the corrected value. The previous results are kept in
+`heatsink/unit-cell/mesh-independence-k4-WRONG.dat` for traceability.
+The correction changed T_max by about 0.2 K across all three meshes and
+had negligible effect on the GCI ratio and asymptotic range check. Full
+writeup in `docs/logbook.md`.
 
 ## Phase 4 — Full-geometry baseline
 
-The unit-cell result above is a useful convergence check, but it isn't
-the real heat sink — it assumes the heat is spread uniformly across the
-whole fin footprint, which the real 20×20 mm chip obviously does not do.
-Phase 4 drops that assumption: real chip footprint, real 8 fins, real
-side walls instead of symmetry, 102,915 cells.
+The unit-cell model assumes uniform heating over one fin pitch. The
+full model instead uses the actual 20×20 mm chip footprint, all eight
+fins, and the complete side boundaries, 102,915 cells.
 
 **Laminar run:** T_max (chip) = 486.55 K, R_th = 2.49 K/W. Energy
 balance checked via a `wallHeatFlux` functionObject on the heatsink
@@ -135,12 +123,10 @@ parametric study in Phase 5.
 (17.4 K/W):** the unit-cell R_th is a per-fin number — one fin carrying
 1/8 of the load. Eight fins carrying the full load in parallel behave
 like eight resistances in parallel: R_th ≈ 17.4/8 ≈ 2.2 K/W would be
-the naive estimate. The measured 2.49 K/W is about 13% higher than that
-naive estimate, which is attributed to spreading resistance (heat has
-to spread laterally from the small chip footprint into the full 40×44 mm
-base before it reaches the outer fins) and edge effects (the outer fins
-see different local flow conditions than the interior ones) — exactly
-the effects the unit-cell/symmetry simplification cannot capture.
+the naive estimate. The difference is attributed to spreading resistance
+(heat has to spread laterally from the small chip footprint into the
+full 40×44 mm base before it reaches the outer fins) and to non-uniform
+flow between interior and outer fin channels.
 
 ### Results
 
@@ -157,21 +143,18 @@ aluminium base → fins → air, in one view.*
 *Streamlines through the fin channels, coloured by velocity magnitude (2.5–5.9 m/s). 
 Flow accelerates in the narrow channels between fins.*
 
-
 ## Phase 5 — Parametric airflow study and Pareto front
 
-The design question that actually matters for a heat sink: how much
-airflow is worth the pumping power it costs. Swept inlet velocity
-(U = 1.0, 1.5, 2.0, 3.0, 4.0 m/s), laminar (justified above), same
-full-sink mesh and load, extracting T_max and inlet/outlet pressure
-drop via `surfaceFieldValue` functionObjects each run.
+The airflow sweep evaluates the trade-off between thermal resistance
+and pumping power. Swept inlet velocity (U = 1.0, 1.5, 2.0, 3.0, 4.0 m/s),
+laminar (justified above), same full-sink mesh and load, extracting
+T_max and inlet/outlet pressure drop via `surfaceFieldValue`
+functionObjects each run.
 
-Airflow rate was chosen as the swept parameter over fin geometry (fin
-spacing, fin height) because it requires no remeshing — each point is
-just a change to `0/air/U` and a rerun, versus a full geometry
-regeneration per point for a fin-spacing sweep. Given the time and
-hardware constraints on this project, that was the right trade-off; a
-fin-geometry sweep is a natural extension if more time is available.
+Airflow velocity was selected as the swept parameter because it can be
+varied without regenerating the mesh (a change to `0/air/U` and a
+rerun). Fin-spacing and fin-height studies would require remeshing per
+point and were left outside the present scope.
 
 | U (m/s) | T_max (K) | R_th (K/W) | dP (Pa) | Pumping power (mW) |
 |---|---|---|---|---|
@@ -187,16 +170,15 @@ Pumping power = dP × Q, with Q = U × inlet cross-section area.
 *Thermal resistance vs. pumping power. All five points are Pareto-optimal
 — none is beaten on both axes by another.*
 
-**Reading the front:** below U ≈ 2 m/s, small increases in pumping power
-buy large drops in R_th (U: 1→2 m/s costs +4.6 mW for -0.59 K/W). Above
-U ≈ 2.5–3 m/s, returns diminish sharply (U: 3→4 m/s costs +14.4 mW for
-only -0.13 K/W). Since there's no single optimal point on a Pareto front,
-and given this trade-off, the sensible operating range is U ≈ 2.0–2.5 m/s.
-A hard requirement elsewhere (a maximum allowable junction temperature, a
-specific fan's pressure-flow curve, a noise or power budget) would push
-the choice outside this range — the lowest airflow that satisfies it,
-even past the knee if needed.
-
+**Pareto interpretation:** below U ≈ 2 m/s, small increases in pumping
+power buy large drops in R_th (U: 1→2 m/s costs +4.6 mW for -0.59 K/W).
+Above U ≈ 2.5–3 m/s, returns diminish sharply (U: 3→4 m/s costs
++14.4 mW for only -0.13 K/W). Since there's no single optimal point on
+a Pareto front, the curve shows a clear reduction in marginal thermal
+benefit above approximately 2–3 m/s. The actual operating point would
+depend on an external constraint (a maximum allowable junction
+temperature, a specific fan's pressure-flow curve, a noise or power
+budget), which this project does not fix.
 
 ## Limitations
 
