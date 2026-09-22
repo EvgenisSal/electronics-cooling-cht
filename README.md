@@ -4,33 +4,26 @@
 
 **75 W chip load | 2.49 K/W baseline R_th (laminar) | 102,915 cells | 1–4 m/s airflow sweep, Pareto analysis**
 
-CHT simulation of an air-cooled plate-fin heat sink, built in OpenFOAM v2606.
-Run entirely on a MacBook Air M2, 8 GB RAM — no cluster, no GPU.
+CHT simulation of an air-cooled plate-fin heat sink using OpenFOAM v2606.
+Developed and run locally on a MacBook Air M2 (8 GB RAM).
 
 Second CFD portfolio project, after [propeller-cfd](https://github.com/EvgenisSal/propeller-cfd).
-That project was about validating a solver against a fluid-dynamics benchmark
-(marine propeller, rotating flow). This one is about applying CFD to a real
-thermal management problem: conjugate heat transfer in electronics cooling,
-the kind of problem that shows up in GPU/CPU heat sinks.
+That project focused on validation against experimental propeller data.
+This one focuses on conjugate heat transfer and electronics cooling.
 
-## What this project actually does
+## What this project does
 
-1. Verifies the numerical building blocks (conduction, forced convection,
-   natural convection) against known analytical/benchmark solutions before
-   trusting the solver on the real geometry.
-2. Builds the heat sink mesh parametrically from a Python script rather than
-   CAD, so the geometry can be regenerated at any refinement level.
-3. Runs a formal mesh-independence study (GCI, Roache's method) on a unit-cell
-   model to get a defensible thermal resistance number with an error bar,
-   not just "a number."
-4. Runs a full baseline CHT case on the real geometry (actual 20×20 mm chip
-   footprint, 8 real fins, no symmetry shortcuts), laminar and k-omega SST,
-   and compares the two.
-5. Runs a parametric airflow sweep and builds a Pareto front (thermal
-   resistance vs. pumping power) — the actual engineering trade-off a
-   thermal design decision would be based on.
-
-Each phase has a purpose. None of it is there to pad the repo.
+1. Validates the main numerical building blocks — conduction, forced
+   convection, and natural convection — against analytical or benchmark
+   solutions.
+2. Generates the heat-sink geometry and mesh parametrically in Python,
+   allowing the geometry to be rebuilt at different refinement levels.
+3. Performs a mesh-independence study using GCI (Roache's method) on a
+   unit-cell model.
+4. Runs the full CHT problem for a 20×20 mm, 75 W chip with an 8-fin
+   heat sink, using both laminar and k-omega SST models.
+5. Sweeps inlet velocity from 1–4 m/s and compares thermal resistance
+   against pumping power to evaluate the cooling-performance trade-off.
 
 ## Physical setup
 
